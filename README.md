@@ -1,249 +1,134 @@
-# YouTubeコメント感情分析システム
+# YouTube コメント感情分析システム
 
-YouTube Data APIを利用した動画コメントの感情分析・集計システム
-
-## 概要
-
-このシステムは、YouTube動画のコメントを収集し、感情分析（ポジティブ/ネガティブ/ニュートラル）を行い、結果を画面に表示します。
-
-**主な機能:**
-
-- YouTube Data API v3によるコメント取得
-- 多言語対応の感情分析（日本語・その他言語）
-- Streamlitによる可視化
-- Docker Composeによる簡単なセットアップ
+YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュートラル / ネガティブに分類して可視化する PHP アプリケーションです。  
+ロリポップ共有サーバーへの配置を前提に、Apache + PHP + MySQL で動作します。
 
 ## 解説動画
 
-このプロジェクトの解説をYouTube動画で公開しています。
+- 準備中
 
-[![YouTube](https://img.shields.io/badge/YouTube-解説動画-red?logo=youtube)](https://www.youtube.com/watch?v=cFRlwFzVWuo)
+## 技術スタック
 
-https://www.youtube.com/watch?v=cFRlwFzVWuo
-
-## 作者
-
-- 遠藤義之
-
-## 前提条件
-
-- Docker / Docker Compose
-- YouTube Data API v3 のAPIキー
-
-本プロジェクトの実行・開発は **Dockerに一本化** しています。
-
-※ 開発者向けの詳細なセットアップ手順は [docs/07\_開発ガイド.md](./docs/07_開発ガイド.md) を参照
-
-## クイックスタート
-
-### 1. 環境変数の設定
-
-`.env.example` をコピーして `.env` を作成し、各値を設定する。
-
-```bash
-cp .env.example .env
-```
-
-必須設定項目：
-
-- `YOUTUBE_API_KEY`: YouTube Data API v3のAPIキー
-
-### 2. ビルドして起動
-
-```bash
-# ビルドと起動を同時に実行（初回）
-docker compose up --build
-
-# バックグラウンドで起動する場合
-docker compose up -d --build
-```
-
-停止する場合：
-
-```bash
-docker compose down
-```
-
-### 3. 環境変数の詳細
-
-| 変数名            | 説明                         | デフォルト値 |
-| ----------------- | ---------------------------- | ------------ |
-| `YOUTUBE_API_KEY` | YouTube Data API v3のAPIキー | **必須**     |
-| `COMMENT_LIMIT`   | コメント取得件数             | 100          |
-
-## 使い方
-
-### CLI（コマンドライン）
-
-#### 単一動画の分析
-
-```bash
-docker compose exec app python main.py --video-id VIDEO_ID
-```
-
-#### コメント取得件数を指定
-
-```bash
-docker compose exec app python main.py --video-id VIDEO_ID --comment-limit 50
-```
-
-#### 複数動画の分析（カンマ区切り）
-
-```bash
-docker compose exec app python main.py --video-ids VIDEO_ID1,VIDEO_ID2,VIDEO_ID3
-```
-
-### Webインターフェース
-
-### 起動後のアクセスURL
-
-- Streamlit: http://localhost:8501
-
-#### Streamlit（可視化ダッシュボード）
-
-ブラウザで http://localhost:8501 にアクセス
-
-- 動画IDを入力して分析実行
-- 感情分析結果をグラフ表示
-- コメント一覧を表示
-
-## Docker操作
-
-### イメージのビルド
-
-```bash
-# 通常のビルド
-docker compose build
-
-# キャッシュを使わずにビルド
-docker compose build --no-cache
-```
-
-### コンテナ起動
-
-```bash
-# フォアグラウンドで起動
-docker compose up
-
-# バックグラウンドで起動
-docker compose up -d
-
-# コンテナ停止
-docker compose down
-```
-
-詳細は [docs/11_Docker操作ガイド.md](./docs/11_Docker操作ガイド.md) を参照
-
-## 感情分析について
-
-本システムは、Hugging Faceの公開モデルを使用した感情分析を行います：
-
-### 使用モデル
-
-- **日本語モデル1**: `christian-phu/bert-finetuned-japanese-sentiment` (3クラス分類)
-- **日本語モデル2**: `kit-nlp/bert-base-japanese-sentiment-irony` (2クラス分類、皮肉検出)
-- **多言語モデル**: `cardiffnlp/twitter-xlm-roberta-base-sentiment` (Twitter感情分析)
-
-### アンサンブル方式
-
-- 日本語コメント：日本語モデル2つのアンサンブル
-- その他言語：多言語モデル
-- ルールベース分類：200以上のパターンで補完
-
-詳細は [docs/08\_感情分析仕様書.md](./docs/08_感情分析仕様書.md) を参照
-
-## ディレクトリ構成
-
-```
-.
-├── docker-compose.yml      # Docker設定
-├── Dockerfile              # Dockerfile
-├── .env                    # 環境変数（要作成）
-├── .env.example            # 環境変数テンプレート
-├── requirements.txt        # Python依存パッケージ
-├── pytest.ini              # pytest設定
-├── app/
-│   ├── main.py             # CLIエントリーポイント
-│   ├── streamlit_app.py    # Streamlit WebアプリUI
-│   ├── fetch/              # YouTube API取得
-│   │   └── youtube.py
-│   ├── sentiment/          # 感情分析
-│   │   └── analyzer.py
-│   └── aggregate/          # 集計処理
-│       └── summarizer.py
-├── docs/                   # 設計ドキュメント
-├── logs/                   # ログ出力
-├── models/                 # 感情分析モデル
-│   └── sentiment-finetuned/  # Fine-tunedモデル（学習後に作成）
-└── tests/                  # テストコード
-    ├── conftest.py
-    ├── test_analyzer.py
-    ├── test_fetch.py
-    ├── test_integration.py
-    └── test_summarizer.py
-```
+| 分類 | 技術 |
+|---|---|
+| バックエンド | PHP 8.1+ |
+| フロントエンド | Vanilla JS, Chart.js |
+| AI | Grok API (xAI) |
+| 外部 API | YouTube Data API v3 |
+| DB | MySQL |
+| テスト | PHPUnit |
+| 配置先 | ロリポップ共有サーバー |
 
 ## 主な機能
 
-- **YouTube Data API連携**: 動画情報とコメントの自動取得
-- **多言語感情分析**: 日本語専用モデル2つ + 多言語モデル1つのアンサンブル
-- **ルールベース分類**: 200以上のパターンマッチングで精度向上
-- **可視化**: Streamlitによるインタラクティブなダッシュボード
-- **テスト**: pytestによる自動テスト
+- YouTube URL / 動画 ID を入力してコメント感情分析を実行
+- コメント件数ごとの分析結果を円グラフと件数で可視化
+- 24 時間キャッシュによる API コール削減
+- 同一 `video_id × comment_limit` の履歴を複数保持し、最新 `analyzed_at` を採用
+- `error_log()` を使った障害調査向けログ出力
+
+## 対応 URL 形式
+
+- `https://www.youtube.com/watch?v=VIDEO_ID`
+- `https://youtu.be/VIDEO_ID`
+- `https://www.youtube.com/embed/VIDEO_ID`
+- `VIDEO_ID`
+
+## セットアップ
+
+### 1. リポジトリ取得
+
+```bash
+git clone <repository-url>
+cd youtube-data-api-comment-sentiment-on-lolipop
+```
+
+### 2. 設定ファイル作成
+
+```bash
+cp php/config.php.example php/config.php
+```
+
+`php/config.php` を編集して以下を設定します。
+
+- `YOUTUBE_API_KEY`
+- `GROK_API_KEY`
+- `GROK_MODEL`
+- `DB_HOST`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+
+### 3. Composer 依存関係インストール
+
+```bash
+cd php
+composer install
+```
+
+### 4. DB スキーマ適用
+
+標準手順は、ロリポップ管理画面から phpMyAdmin を開いて対象 DB を選択し、[php/sql/schema.sql](php/sql/schema.sql) を実行する方法です。  
+SSH / CLI が使える場合は、既存 DB に対して同じ SQL を流し込んでも構いません。
+
+### 5. ローカル確認
+
+```bash
+cd php
+php -S localhost:8080
+```
+
+ブラウザで `http://localhost:8080` を開きます。
 
 ## テスト実行
 
 ```bash
-# すべてのテストを実行
-docker compose exec app pytest
+cd php
+vendor/bin/phpunit
+```
 
-# カバレッジ付きでテスト実行
-docker compose exec app pytest --cov=app --cov-report=html
+## ディレクトリ構成
 
-# 特定のテストファイルのみ実行
-docker compose exec app pytest tests/test_analyzer.py
+```text
+youtube-data-api-comment-sentiment-on-lolipop/
+├── php/                        # メインアプリケーション
+│   ├── api/
+│   ├── assets/
+│   ├── sql/
+│   ├── src/
+│   ├── tests/
+│   ├── config.php.example      # 設定サンプル
+│   ├── composer.json
+│   └── index.php
+├── docs/                       # 設計・運用ドキュメント
+├── .gitignore
+├── README.md
+└── CLAUDE.md
 ```
 
 ## ドキュメント
 
-詳細な設計ドキュメントは [docs/](./docs/) を参照。
+| # | ドキュメント | 内容 |
+|---|---|---|
+| 01 | [企画書](docs/01_企画書.md) | プロジェクト概要・目的 |
+| 02 | [要件定義書](docs/02_要件定義書.md) | 業務要件・機能要件 |
+| 03 | [技術スタック](docs/03_技術スタック.md) | 使用技術一覧 |
+| 04 | [基本設計書](docs/04_基本設計書.md) | システム構成・処理フロー |
+| 05 | [詳細設計書](docs/05_詳細設計書.md) | PHP クラス設計・API 仕様 |
+| 06 | [データ仕様書](docs/06_データ仕様書.md) | JSON スキーマ定義 |
+| 07 | [テーブルレイアウト](docs/07_テーブルレイアウト.md) | MySQL テーブル定義 |
+| 08 | [AI仕様書](docs/08_AI仕様書.md) | Grok API 利用仕様 |
+| 09 | [ディレクトリ構成](docs/09_ディレクトリ構成.md) | プロジェクト構造詳細 |
+| 10 | [テスト仕様書](docs/10_テスト仕様書.md) | テスト設計・テストケース |
+| 11 | [VSCode開発マニュアル](docs/11_VSCode開発マニュアル.md) | ローカル開発手順 |
+| 12 | [デプロイ手順書](docs/12_デプロイ手順書.md) | 初回配置・更新反映手順 |
+| 13 | [運用手順書](docs/13_運用手順書.md) | キャッシュ運用・障害対応 |
+| 14 | [操作マニュアル](docs/14_操作マニュアル.md) | エンドユーザー向け操作説明 |
 
-### 開発者向けドキュメント（推奨）
+## 作者
 
-- **[07\_開発ガイド](./docs/07_開発ガイド.md)** - VSCodeでのローカル開発手順（最初に読む）
-- **[06\_命名規約](./docs/06_命名規約.md)** - コーディング規約
-- **[09\_単体テスト仕様書](./docs/09_単体テスト仕様書.md)** - テスト方法
+遠藤 義之
 
-### 全ドキュメント一覧
+## ライセンス
 
-| ドキュメント                                          | 内容                                  |
-| ----------------------------------------------------- | ------------------------------------- |
-| [01\_要件定義書](./docs/01_要件定義書.md)             | 機能要件・非機能要件・APIクォータ対策 |
-| [02\_基本設計書](./docs/02_基本設計書.md)             | Docker構成・ネットワーク設計          |
-| [03\_詳細設計書](./docs/03_詳細設計書.md)             | モジュール構成・関数仕様              |
-| [04\_データ仕様書](./docs/04_データ仕様書.md)         | JSONスキーマ・テーブル定義            |
-| [05\_ディレクトリ構成](./docs/05_ディレクトリ構成.md) | プロジェクト構造の詳細説明            |
-| [06\_命名規約](./docs/06_命名規約.md)                 | コーディング規約                      |
-| [07\_開発ガイド](./docs/07_開発ガイド.md)             | VSCodeでのローカル開発手順            |
-| [08\_感情分析仕様書](./docs/08_感情分析仕様書.md)     | 感情分析アルゴリズム・多言語対応      |
-| [09\_単体テスト仕様書](./docs/09_単体テスト仕様書.md) | テスト方針・テストケース              |
-| [10\_運用設計書](./docs/10_運用設計書.md)             | ログ設計・障害対応                    |
-| [11_Docker操作ガイド](./docs/11_Docker操作ガイド.md)  | Docker環境の構築・運用方法            |
-| [12_Azure_Terraform_デプロイガイド](./docs/12_Azure_Terraform_デプロイガイド.md) | Azure Container Appsへのデプロイ手順 |
-
-## トラブルシューティング
-
-### APIクォータ超過エラー
-
-```
-APIクォータ超過またはコメントが無効です
-```
-
-- YouTube Data APIの1日のクォータ（10,000ユニット）を超過しています
-- 翌日まで待つか、Google Cloud Consoleでクォータ増量をリクエストしてください
-
-### 感情分析モデルエラー
-
-- デフォルトではHugging Faceの公開モデルを使用します
-- モデルロードに失敗した場合はルールベース分類にフォールバックします
-- 初回起動時はモデルのダウンロードに時間がかかる場合があります
+MIT License

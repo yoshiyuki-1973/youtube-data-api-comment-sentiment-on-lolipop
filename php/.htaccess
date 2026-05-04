@@ -1,0 +1,18 @@
+# config.php を直接参照させない
+<Files "config.php">
+    Require all denied
+</Files>
+<Files "config.example.php">
+    Require all denied
+</Files>
+
+# 不要なファイルアクセスを禁止
+<Files "*.md">
+    Require all denied
+</Files>
+
+# index.php をデフォルトドキュメントに設定
+DirectoryIndex index.php
+
+# 文字コード
+AddDefaultCharset UTF-8

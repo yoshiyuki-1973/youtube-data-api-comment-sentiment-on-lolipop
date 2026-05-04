@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PHP: Start Local Server",
+      "type": "shell",
+      "command": "php",
+      "args": ["-S", "localhost:8080"],
+      "options": {
+        "cwd": "${workspaceFolder}/php"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PHPUnit: Run All",
+      "type": "shell",
+      "command": "vendor/bin/phpunit",
+      "options": {
+        "cwd": "${workspaceFolder}/php"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
