@@ -6,16 +6,15 @@ require_once dirname(__DIR__) . '/src/bootstrap.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-// CSRF対策：POST のみ受け付ける
+// POST リクエストのみ受け付ける
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method Not Allowed']);
     exit;
 }
 
-// リクエストボディ取得
-$input        = json_decode(file_get_contents('php://input'), true) ?? [];
-$rawInput     = trim((string)($input['url'] ?? ''));
+$input = json_decode(file_get_contents('php://input'), true) ?? [];
+$rawInput = trim((string)($input['url'] ?? ''));
 $commentLimit = max(1, min(100, (int)($input['limit'] ?? 10)));
 
 if ($rawInput === '') {
@@ -25,64 +24,58 @@ if ($rawInput === '') {
 }
 
 try {
-    // 動画ID抽出
     $videoId = YouTubeClient::extractVideoId($rawInput);
 
-    // キャッシュ確認
-    $db         = Database::getInstance();
+    $db = Database::getInstance();
     $repository = new VideoRepository($db);
-    $cached     = $repository->findCachedResult($videoId, $commentLimit);
+    $cached = $repository->findCachedResult($videoId, $commentLimit);
 
     if ($cached !== null) {
         echo json_encode([
             'success' => true,
-            'cached'  => true,
-            'video'   => [
-                'video_id'      => $cached['video_id'],
-                'title'         => $cached['title'],
-                'channel_name'  => $cached['channel_name'],
-                'view_count'    => (int)$cached['view_count'],
-                'like_count'    => (int)$cached['like_count'],
+            'cached' => true,
+            'video' => [
+                'video_id' => $cached['video_id'],
+                'title' => $cached['title'],
+                'channel_name' => $cached['channel_name'],
+                'view_count' => (int)$cached['view_count'],
+                'like_count' => (int)$cached['like_count'],
                 'comment_count' => (int)$cached['comment_count'],
             ],
-            'summary'  => buildSummary($cached),
+            'summary' => buildSummary($cached),
             'comments' => formatComments($cached['comments']),
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    // YouTube API から取得
     $ytClient = new YouTubeClient(Config::require('YOUTUBE_API_KEY'));
-    $video    = $ytClient->fetchVideo($videoId);
+    $video = $ytClient->fetchVideo($videoId);
     $comments = $ytClient->fetchComments($videoId, $commentLimit);
 
-    // Grok API で感情分析
     $grokClient = new GrokClient(
         Config::require('GROK_API_KEY'),
         Config::get('GROK_MODEL', 'grok-3-mini')
     );
-    $analyzer        = new SentimentAnalyzer($grokClient);
+    $analyzer = new SentimentAnalyzer($grokClient);
     $analyzedComments = $analyzer->analyzeComments($comments);
-    $summary          = SentimentAnalyzer::summarize($analyzedComments);
+    $summary = SentimentAnalyzer::summarize($analyzedComments);
 
-    // DB に保存
-    $result = $repository->saveResult($video, $analyzedComments, $summary, $commentLimit);
+    $repository->saveResult($video, $analyzedComments, $summary, $commentLimit);
 
     echo json_encode([
         'success' => true,
-        'cached'  => false,
-        'video'   => [
-            'video_id'      => $video['video_id'],
-            'title'         => $video['title'],
-            'channel_name'  => $video['channel_name'],
-            'view_count'    => $video['view_count'],
-            'like_count'    => $video['like_count'],
+        'cached' => false,
+        'video' => [
+            'video_id' => $video['video_id'],
+            'title' => $video['title'],
+            'channel_name' => $video['channel_name'],
+            'view_count' => $video['view_count'],
+            'like_count' => $video['like_count'],
             'comment_count' => $video['comment_count'],
         ],
-        'summary'  => $summary,
+        'summary' => $summary,
         'comments' => formatComments($analyzedComments),
     ], JSON_UNESCAPED_UNICODE);
-
 } catch (\InvalidArgumentException $e) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -103,26 +96,23 @@ try {
     echo json_encode(['success' => false, 'error' => 'AI分析サービスへの接続に失敗しました。しばらく待ってから再試行してください。']);
 } catch (\Throwable $e) {
     http_response_code(500);
-    // 本番環境では詳細エラーをユーザーに見せない
     echo json_encode(['success' => false, 'error' => 'サーバーエラーが発生しました。']);
     error_log('[YT Sentiment] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 }
 
-// --- ヘルパー関数 ---
-
 function buildSummary(array $data): array
 {
     return [
-        'positive_count'     => (int)$data['positive_count'],
-        'negative_count'     => (int)$data['negative_count'],
-        'neutral_count'      => (int)$data['neutral_count'],
-        'total_count'        => (int)$data['total_count'],
-        'positive_ratio'     => (float)$data['positive_ratio'],
-        'negative_ratio'     => (float)$data['negative_ratio'],
-        'neutral_ratio'      => (float)$data['neutral_ratio'],
+        'positive_count' => (int)$data['positive_count'],
+        'negative_count' => (int)$data['negative_count'],
+        'neutral_count' => (int)$data['neutral_count'],
+        'total_count' => (int)$data['total_count'],
+        'positive_ratio' => (float)$data['positive_ratio'],
+        'negative_ratio' => (float)$data['negative_ratio'],
+        'neutral_ratio' => (float)$data['neutral_ratio'],
         'avg_positive_score' => (float)$data['avg_positive_score'],
         'avg_negative_score' => (float)$data['avg_negative_score'],
-        'avg_neutral_score'  => (float)$data['avg_neutral_score'],
+        'avg_neutral_score' => (float)$data['avg_neutral_score'],
     ];
 }
 
@@ -130,14 +120,14 @@ function formatComments(array $comments): array
 {
     return array_map(static function (array $c): array {
         return [
-            'text'           => $c['text'] ?? $c['comment_text'] ?? '',
-            'author'         => $c['author'] ?? $c['author_name'] ?? '',
-            'like_count'     => (int)($c['like_count'] ?? 0),
-            'published_at'   => $c['published_at'] ?? '',
-            'sentiment'      => $c['sentiment'],
+            'text' => $c['text'] ?? $c['comment_text'] ?? '',
+            'author' => $c['author'] ?? $c['author_name'] ?? '',
+            'like_count' => (int)($c['like_count'] ?? 0),
+            'published_at' => $c['published_at'] ?? '',
+            'sentiment' => $c['sentiment'],
             'positive_score' => (float)$c['positive_score'],
             'negative_score' => (float)$c['negative_score'],
-            'neutral_score'  => (float)$c['neutral_score'],
+            'neutral_score' => (float)$c['neutral_score'],
         ];
     }, $comments);
 }

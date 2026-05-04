@@ -6,8 +6,6 @@ use PHPUnit\Framework\TestCase;
 
 class YouTubeClientTest extends TestCase
 {
-    // extractVideoId のテスト（外部API不要）
-
     public function testExtractsVideoIdFromWatchUrl(): void
     {
         $id = YouTubeClient::extractVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
@@ -48,6 +46,12 @@ class YouTubeClientTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         YouTubeClient::extractVideoId('not-a-valid-url');
+    }
+
+    public function testThrowsOnNonYoutubeUrlEvenIfVParameterExists(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        YouTubeClient::extractVideoId('https://example.com/watch?v=dQw4w9WgXcQ');
     }
 
     public function testThrowsOnEmptyString(): void

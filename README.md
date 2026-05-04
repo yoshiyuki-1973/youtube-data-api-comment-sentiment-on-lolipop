@@ -1,6 +1,6 @@
 # YouTube コメント感情分析システム
 
-YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュートラル / ネガティブに分類して可視化する PHP アプリケーションです。  
+YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュートラル / ネガティブに分類して可視化する PHP アプリケーションです。
 ロリポップ共有サーバーへの配置を前提に、Apache + PHP + MySQL で動作します。
 
 ## 解説動画
@@ -11,7 +11,7 @@ YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュ
 
 | 分類 | 技術 |
 |---|---|
-| バックエンド | PHP 8.1+ |
+| バックエンド | PHP 8.3 |
 | フロントエンド | Vanilla JS, Chart.js |
 | AI | Grok API (xAI) |
 | 外部 API | YouTube Data API v3 |
@@ -35,6 +35,11 @@ YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュ
 - `VIDEO_ID`
 
 ## セットアップ
+
+前提:
+
+- PHP 8.3
+- Composer 2
 
 ### 1. リポジトリ取得
 
@@ -66,9 +71,11 @@ cd php
 composer install
 ```
 
+`composer install` は PHP 8.3 と Composer 2 を前提とする。
+
 ### 4. DB スキーマ適用
 
-標準手順は、ロリポップ管理画面から phpMyAdmin を開いて対象 DB を選択し、[php/sql/schema.sql](php/sql/schema.sql) を実行する方法です。  
+標準手順は、ロリポップ管理画面から phpMyAdmin を開いて対象 DB を選択し、[php/sql/schema.sql](php/sql/schema.sql) を実行する方法です。
 SSH / CLI が使える場合は、既存 DB に対して同じ SQL を流し込んでも構いません。
 
 ### 5. ローカル確認
@@ -84,8 +91,12 @@ php -S localhost:8080
 
 ```bash
 cd php
+composer install
 vendor/bin/phpunit
 ```
+
+`vendor/bin/phpunit` は `composer install` 実行後に生成される。
+このファイルが存在しない場合、または `composer install` が前提条件不足で失敗する場合、動的テストは未実施となる。
 
 ## ディレクトリ構成
 
