@@ -7,13 +7,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class SentimentAnalyzerTest extends TestCase
 {
-    private GrokClient&MockObject $grokMock;
+    private GeminiClient&MockObject $geminiMock;
     private SentimentAnalyzer $analyzer;
 
     protected function setUp(): void
     {
-        $this->grokMock = $this->createMock(GrokClient::class);
-        $this->analyzer = new SentimentAnalyzer($this->grokMock);
+        $this->geminiMock = $this->createMock(GeminiClient::class);
+        $this->analyzer = new SentimentAnalyzer($this->geminiMock);
     }
 
     public function testAnalyzeCommentsAttachesScores(): void
@@ -23,7 +23,7 @@ class SentimentAnalyzerTest extends TestCase
             ['text' => 'つまらない',   'author' => 'ユーザーB', 'like_count' => 2,  'published_at' => '2024-01-02T00:00:00Z'],
         ];
 
-        $this->grokMock
+        $this->geminiMock
             ->expects($this->once())
             ->method('analyzeSentimentBatch')
             ->willReturn([
@@ -42,7 +42,7 @@ class SentimentAnalyzerTest extends TestCase
 
     public function testAnalyzeEmptyCommentsReturnsEmpty(): void
     {
-        $this->grokMock->expects($this->never())->method('analyzeSentimentBatch');
+        $this->geminiMock->expects($this->never())->method('analyzeSentimentBatch');
 
         $result = $this->analyzer->analyzeComments([]);
         $this->assertSame([], $result);
@@ -55,7 +55,7 @@ class SentimentAnalyzerTest extends TestCase
         ];
 
         // スコアが1件返ってくる想定だが0件返す
-        $this->grokMock
+        $this->geminiMock
             ->method('analyzeSentimentBatch')
             ->willReturn([]);
 

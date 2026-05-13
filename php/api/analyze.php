@@ -24,6 +24,10 @@ if ($rawInput === '') {
 }
 
 try {
+    if (!class_exists(GeminiClient::class)) {
+        throw new \RuntimeException('AI分析クライアントのファイルが見つかりません。php/src/GeminiClient.php をサーバーへアップロードしてください。');
+    }
+
     $videoId = YouTubeClient::extractVideoId($rawInput);
 
     $db = Database::getInstance();
@@ -52,11 +56,11 @@ try {
     $video = $ytClient->fetchVideo($videoId);
     $comments = $ytClient->fetchComments($videoId, $commentLimit);
 
-    $grokClient = new GrokClient(
-        Config::require('GROK_API_KEY'),
-        Config::get('GROK_MODEL', 'grok-3-mini')
+    $geminiClient = new GeminiClient(
+        Config::require('GEMINI_API_KEY'),
+        Config::get('GEMINI_MODEL', 'gemini-2.5-flash')
     );
-    $analyzer = new SentimentAnalyzer($grokClient);
+    $analyzer = new SentimentAnalyzer($geminiClient);
     $analyzedComments = $analyzer->analyzeComments($comments);
     $summary = SentimentAnalyzer::summarize($analyzedComments);
 
@@ -91,13 +95,21 @@ try {
 } catch (CommentsDisabledException $e) {
     http_response_code(422);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-} catch (GrokApiException $e) {
+} catch (GeminiApiException $e) {
     http_response_code(502);
     echo json_encode(['success' => false, 'error' => 'AI分析サービスへの接続に失敗しました。しばらく待ってから再試行してください。']);
+} catch (\PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'データベース接続に失敗しました。DB設定とテーブル作成状況を確認してください。'], JSON_UNESCAPED_UNICODE);
+    error_log('[YT Sentiment] Database error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+} catch (\RuntimeException $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'サーバー設定に問題があります。config.php とアップロード済みファイルを確認してください。'], JSON_UNESCAPED_UNICODE);
+    error_log('[YT Sentiment] Runtime error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 } catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'サーバーエラーが発生しました。']);
-    error_log('[YT Sentiment] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    error_log('[YT Sentiment] ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 }
 
 function buildSummary(array $data): array

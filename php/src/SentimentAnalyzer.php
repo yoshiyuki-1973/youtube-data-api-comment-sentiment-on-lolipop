@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 class SentimentAnalyzer
 {
-    public function __construct(private readonly GrokClient $grokClient) {}
+    public function __construct(private readonly GeminiClient $geminiClient) {}
 
     /**
      * コメント配列を感情分析し、各コメントにスコアとラベルを付与して返す
@@ -19,7 +19,7 @@ class SentimentAnalyzer
             return [];
         }
 
-        $scores  = $this->grokClient->analyzeSentimentBatch($comments);
+        $scores  = $this->geminiClient->analyzeSentimentBatch($comments);
         $results = [];
 
         foreach ($comments as $i => $comment) {

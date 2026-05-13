@@ -14,7 +14,7 @@
                 <span class="header__icon">▶</span>
                 YouTube コメント 感情分析
             </h1>
-            <p class="header__subtitle">Powered by Grok AI &amp; YouTube Data API</p>
+            <p class="header__subtitle">Powered by Gemini &amp; YouTube Data API</p>
         </div>
     </header>
 
@@ -146,7 +146,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>YouTube コメント感情分析 | Powered by <a href="https://x.ai" target="_blank" rel="noopener">Grok AI</a></p>
+            <p>YouTube コメント感情分析 | Powered by <a href="https://ai.google.dev/gemini-api" target="_blank" rel="noopener">Gemini</a></p>
         </div>
     </footer>
 

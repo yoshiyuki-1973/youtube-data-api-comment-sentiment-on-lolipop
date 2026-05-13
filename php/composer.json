@@ -1,6 +1,6 @@
 {
     "name": "yt-comment-sentiment/lolipop",
-    "description": "YouTube動画コメント感情分析システム（PHP + Grok API + MySQL）",
+    "description": "YouTube動画コメント感情分析システム（PHP + Gemini API + MySQL）",
     "type": "project",
     "require": {
         "php": "^8.3"

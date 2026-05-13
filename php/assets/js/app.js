@@ -34,7 +34,7 @@ async function runAnalysis() {
     hideResult();
 
     try {
-        setTimeout(() => setLoadingText('Grok AIで感情分析中...'), 2000);
+        setTimeout(() => setLoadingText('Geminiで感情分析中...'), 2000);
 
         const res  = await fetch('api/analyze.php', {
             method:  'POST',

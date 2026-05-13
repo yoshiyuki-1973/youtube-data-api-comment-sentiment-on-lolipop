@@ -9,11 +9,11 @@ return [
     // Google Cloud Console で取得したAPIキー
     'YOUTUBE_API_KEY' => 'YOUR_YOUTUBE_API_KEY_HERE',
 
-    // ===== Grok API (xAI) =====
-    // https://console.x.ai/ で取得したAPIキー
-    'GROK_API_KEY'    => 'YOUR_GROK_API_KEY_HERE',
-    // 使用するモデル（grok-3-mini / grok-beta / grok-2-1212）
-    'GROK_MODEL'      => 'grok-3-mini',
+    // ===== Gemini API =====
+    // https://aistudio.google.com/app/apikey で取得したAPIキー
+    'GEMINI_API_KEY'  => 'YOUR_GEMINI_API_KEY_HERE',
+    // 使用するモデル（gemini-2.5-flash / gemini-2.5-pro）
+    'GEMINI_MODEL'    => 'gemini-2.5-flash',
 
     // ===== MySQL（ロリポップのマイSQL情報） =====
     'DB_HOST'    => 'mysql**.lolipop.jp',   // ロリポップ管理画面で確認
