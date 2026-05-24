@@ -1,5 +1,8 @@
 'use strict';
 
+const APP_VERSION = '2026-05-14-timeout-1';
+console.info(`YT Sentiment app.js ${APP_VERSION}`);
+
 // --- DOM参照 ---
 const form        = document.getElementById('analyzeForm');
 const urlInput    = document.getElementById('urlInput');
@@ -33,25 +36,64 @@ async function runAnalysis() {
     hideError();
     hideResult();
 
+    let timeoutId = null;
+    let didTimeout = false;
+
     try {
         setTimeout(() => setLoadingText('Geminiで感情分析中...'), 2000);
+
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => {
+            didTimeout = true;
+            controller.abort();
+            showError('分析がタイムアウトしました。コメント件数を減らして再試行してください。');
+            setLoading(false);
+        }, 90000);
 
         const res  = await fetch('api/analyze.php', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({ url, limit }),
+            signal: controller.signal,
         });
-        const data = await res.json();
+        clearTimeout(timeoutId);
+        timeoutId = null;
+        if (didTimeout) {
+            return;
+        }
+        const responseText = await res.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            const detail = responseText.trim().slice(0, 300);
+            showError(`サーバーからJSON以外の応答が返りました。HTTP ${res.status}${detail ? `: ${detail}` : ''}`);
+            return;
+        }
 
         if (!data.success) {
             showError(data.error ?? 'エラーが発生しました。');
             return;
         }
 
-        renderResult(data);
+        try {
+            renderResult(data);
+        } catch (renderError) {
+            console.error(renderError);
+            showError(`結果表示中にエラーが発生しました: ${renderError.message}`);
+        }
     } catch (err) {
-        showError('サーバーへの接続に失敗しました。ページを再読み込みしてください。');
+        console.error(err);
+        const message = err.name === 'AbortError'
+            ? '分析がタイムアウトしました。コメント件数を減らして再試行してください。'
+            : `サーバーへの接続に失敗しました: ${err.message}`;
+        if (!didTimeout) {
+            showError(message);
+        }
     } finally {
+        if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+        }
         setLoading(false);
     }
 }
@@ -103,7 +145,12 @@ function renderSummary(s) {
     }, 100);
 
     // Chart.js ドーナツグラフ
-    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    const chartCanvas = document.getElementById('sentimentChart');
+    if (!chartCanvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const ctx = chartCanvas.getContext('2d');
     if (chartInstance) chartInstance.destroy();
 
     chartInstance = new Chart(ctx, {

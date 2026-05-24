@@ -95,6 +95,10 @@ try {
 } catch (CommentsDisabledException $e) {
     http_response_code(422);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+} catch (YouTubeApiException $e) {
+    http_response_code(502);
+    echo json_encode(['success' => false, 'error' => 'YouTube APIへの接続または応答処理に失敗しました。APIキー、クォータ、対象動画を確認してください。'], JSON_UNESCAPED_UNICODE);
+    error_log('[YT Sentiment] YouTube API error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 } catch (GeminiApiException $e) {
     http_response_code(502);
     echo json_encode(['success' => false, 'error' => 'AI分析サービスへの接続に失敗しました。しばらく待ってから再試行してください。']);

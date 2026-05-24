@@ -150,6 +150,7 @@
         </div>
     </footer>
 
-    <script src="assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/app.js?v=20260514-timeout2"></script>
 </body>
 </html>
