@@ -1,4 +1,4 @@
-# Project Guide
+﻿# Project Guide
 
 このリポジトリのメイン開発対象は `php/` ディレクトリです。
 旧 Python / Docker / Terraform 構成は廃止し、現行はロリポップ共有サーバー向けの PHP アプリケーションとして整理しています。
@@ -9,7 +9,7 @@
 |---|---|
 | 言語 | PHP 8.3 |
 | 実行環境 | Apache + PHP |
-| AI | Grok API |
+| AI | Gemini API |
 | 外部 API | YouTube Data API v3 |
 | DB | MySQL |
 | テスト | PHPUnit |
@@ -47,7 +47,7 @@ vendor/bin/phpunit
 
 ## Deploy
 
-デプロイ手順は [docs/12_デプロイ手順書.md](docs/12_デプロイ手順書.md) を参照してください。
+デプロイ手順は [docs/13_デプロイ手順書.md](docs/13_デプロイ手順書.md) を参照してください。
 `config.php` は `.gitignore` 対象のため、Git ではなく手動で配置します。
 
 ## Structure

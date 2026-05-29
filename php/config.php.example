@@ -1,24 +1,30 @@
 <?php
 /**
- * 設定ファイルサンプル
- * このファイルを config.php にコピーして実際の値を設定すること
+ * 設定ファイルサンプル（ロリポップサーバー用）
+ *
+ * 使い方:
+ *   cp config.php.example config.php
+ * または Docker 環境の場合:
+ *   cp config.php.docker.example config.php
+ *
  * config.php は .gitignore で管理対象外にすること
  */
 return [
     // ===== YouTube Data API =====
-    // Google Cloud Console で取得したAPIキー
+    // Google Cloud Console で取得した API キー
     'YOUTUBE_API_KEY' => 'YOUR_YOUTUBE_API_KEY_HERE',
 
     // ===== Gemini API =====
-    // https://aistudio.google.com/app/apikey で取得したAPIキー
+    // https://aistudio.google.com/app/apikey で取得した API キー
     'GEMINI_API_KEY'  => 'YOUR_GEMINI_API_KEY_HERE',
     // 使用するモデル（gemini-2.5-flash / gemini-2.5-pro）
     'GEMINI_MODEL'    => 'gemini-2.5-flash',
 
-    // ===== MySQL（ロリポップのマイSQL情報） =====
-    'DB_HOST'    => 'mysql**.lolipop.jp',   // ロリポップ管理画面で確認
-    'DB_NAME'    => 'your_database_name',   // データベース名
-    'DB_USER'    => 'your_db_user',         // ユーザー名
-    'DB_PASS'    => 'your_db_password',     // パスワード
+    // ===== MySQL（ロリポップ マイSQL） =====
+    // ロリポップ管理画面の「データベース」から確認する
+    'DB_HOST'    => 'mysql**.lolipop.jp',  // ロリポップ管理画面で確認
+    'DB_NAME'    => 'your_database_name',  // データベース名
+    'DB_USER'    => 'your_db_user',        // ユーザー名
+    'DB_PASS'    => 'your_db_password',    // パスワード
     'DB_CHARSET' => 'utf8mb4',
 ];

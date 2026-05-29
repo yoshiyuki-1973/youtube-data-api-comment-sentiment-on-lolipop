@@ -1,0 +1,31 @@
+<?php
+/**
+ * 設定ファイルサンプル（Docker 環境用）
+ *
+ * 使い方:
+ *   cp config.php.docker.example config.php
+ *
+ * DB 接続情報は docker-compose.yml の db サービスに合わせて設定済み。
+ * YOUTUBE_API_KEY と GEMINI_API_KEY のみ実際の値に書き換えること。
+ *
+ * config.php は .gitignore で管理対象外にすること
+ */
+return [
+    // ===== YouTube Data API =====
+    // Google Cloud Console で取得した API キー
+    'YOUTUBE_API_KEY' => 'YOUR_YOUTUBE_API_KEY_HERE',
+
+    // ===== Gemini API =====
+    // https://aistudio.google.com/app/apikey で取得した API キー
+    'GEMINI_API_KEY'  => 'YOUR_GEMINI_API_KEY_HERE',
+    // 使用するモデル（gemini-2.5-flash / gemini-2.5-pro）
+    'GEMINI_MODEL'    => 'gemini-2.5-flash',
+
+    // ===== MySQL（docker-compose の db サービス） =====
+    // docker-compose.yml の environment に合わせた値。変更不要。
+    'DB_HOST'    => 'db',           // docker-compose のサービス名
+    'DB_NAME'    => 'yt_sentiment', // MYSQL_DATABASE
+    'DB_USER'    => 'appuser',      // MYSQL_USER
+    'DB_PASS'    => 'secret',       // MYSQL_PASSWORD
+    'DB_CHARSET' => 'utf8mb4',
+];

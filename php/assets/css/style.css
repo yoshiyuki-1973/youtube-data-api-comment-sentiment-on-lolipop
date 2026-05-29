@@ -1,6 +1,8 @@
 /* ===== リセット & ベース ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+[hidden] { display: none !important; }
+
 :root {
     --color-bg:         #0f0f0f;
     --color-surface:    #1a1a1a;

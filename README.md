@@ -1,6 +1,6 @@
-# YouTube コメント感情分析システム
+﻿# YouTube コメント感情分析システム
 
-YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュートラル / ネガティブに分類して可視化する PHP アプリケーションです。
+YouTube 動画のコメントを取得し、Gemini API でポジティブ / ニュートラル / ネガティブに分類して可視化する PHP アプリケーションです。
 ロリポップ共有サーバーへの配置を前提に、Apache + PHP + MySQL で動作します。
 
 ## 解説動画
@@ -13,7 +13,7 @@ YouTube 動画のコメントを取得し、Grok API でポジティブ / ニュ
 |---|---|
 | バックエンド | PHP 8.3 |
 | フロントエンド | Vanilla JS, Chart.js |
-| AI | Grok API (xAI) |
+| AI | Gemini API (Google) |
 | 外部 API | YouTube Data API v3 |
 | DB | MySQL |
 | テスト | PHPUnit |
@@ -57,8 +57,8 @@ cp php/config.php.example php/config.php
 `php/config.php` を編集して以下を設定します。
 
 - `YOUTUBE_API_KEY`
-- `GROK_API_KEY`
-- `GROK_MODEL`
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL`
 - `DB_HOST`
 - `DB_NAME`
 - `DB_USER`
@@ -78,7 +78,7 @@ composer install
 標準手順は、ロリポップ管理画面から phpMyAdmin を開いて対象 DB を選択し、[php/sql/schema.sql](php/sql/schema.sql) を実行する方法です。
 ロリポップ本番環境への反映は、SSH ログインを使わず、phpMyAdmin と FTP / ロリポップFTPで行います。
 
-本番アップロード後は、ディレクトリ `705`、公開ファイル `604`、`config.php` は原則 `600` のパーミッションを確認します。詳細は [デプロイ手順書](docs/12_デプロイ手順書.md) を参照してください。
+本番アップロード後は、ディレクトリ `705`、公開ファイル `604`、`config.php` は原則 `600` のパーミッションを確認します。詳細は [デプロイ手順書](docs/13_デプロイ手順書.md) を参照してください。
 
 ### 5. ローカル確認
 
@@ -130,13 +130,14 @@ youtube-data-api-comment-sentiment-on-lolipop/
 | 05 | [詳細設計書](docs/05_詳細設計書.md) | PHP クラス設計・API 仕様 |
 | 06 | [データ仕様書](docs/06_データ仕様書.md) | JSON スキーマ定義 |
 | 07 | [テーブルレイアウト](docs/07_テーブルレイアウト.md) | MySQL テーブル定義 |
-| 08 | [AI仕様書](docs/08_AI仕様書.md) | Grok API 利用仕様 |
+| 08 | [AI仕様書](docs/08_AI仕様書.md) | Gemini API 利用仕様 |
 | 09 | [ディレクトリ構成](docs/09_ディレクトリ構成.md) | プロジェクト構造詳細 |
 | 10 | [テスト仕様書](docs/10_テスト仕様書.md) | テスト設計・テストケース |
 | 11 | [VSCode開発マニュアル](docs/11_VSCode開発マニュアル.md) | ローカル開発手順 |
-| 12 | [デプロイ手順書](docs/12_デプロイ手順書.md) | 初回配置・更新反映手順 |
-| 13 | [運用手順書](docs/13_運用手順書.md) | キャッシュ運用・障害対応 |
-| 14 | [操作マニュアル](docs/14_操作マニュアル.md) | エンドユーザー向け操作説明 |
+| 12 | [Docker環境構築ガイド](docs/12_Docker環境構築ガイド.md) | Docker でのローカル実行手順 |
+| 13 | [デプロイ手順書](docs/13_デプロイ手順書.md) | 初回配置・更新反映手順 |
+| 14 | [運用手順書](docs/14_運用手順書.md) | キャッシュ運用・障害対応 |
+| 15 | [操作マニュアル](docs/15_操作マニュアル.md) | エンドユーザー向け操作説明 |
 
 ## 作者
 

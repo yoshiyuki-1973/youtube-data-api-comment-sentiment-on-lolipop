@@ -6,7 +6,7 @@ class GeminiClient
 {
     private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
     private const TIMEOUT = 60;
-    private const BATCH_SIZE = 10;
+    private const BATCH_SIZE = 20;
 
     public function __construct(
         private readonly string $apiKey,

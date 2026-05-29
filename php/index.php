@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube コメント 感情分析</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260530-hidden-fix">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -39,7 +39,6 @@
                     <label class="form__label" for="limitSelect">取得コメント数</label>
                     <select id="limitSelect" class="form__select">
                         <option value="10" selected>10件</option>
-                        <option value="20">20件</option>
                         <option value="30">30件</option>
                         <option value="50">50件</option>
                         <option value="100">100件</option>
@@ -150,6 +149,7 @@
         </div>
     </footer>
 
-    <script src="assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/app.js?v=20260530-loading-fix"></script>
 </body>
 </html>
